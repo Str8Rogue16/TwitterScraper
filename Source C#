@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+// Adding Task Parallel Library (TPL)
+using System.Threading.Tasks.Parallel;
+
+
+namespace TwitterScraper {
+  public class TwitterScraper {
+  
+      private readonly HttpClient _httpClient;
+
+      public TwitterScraper ()
+      }
+
+  public async Task<List<Tweet>> GetTweetsAsync(string query) {
+
+// Twitter API Goes here 
+    var url = $"https://api.twitter.com/2/tweets/search/all?query={query}&max_results=100";
+
+// Adding loadbalancer 
+// When scraping the tweets, use load balance to send the request to the appropriate server. 
+    var response = await (loadBalancer ?? _httpClient) .GetAsync(url);
+    if (!response.IsSuccessStatusCode) { 
+      throw new Exception ($Failed to Scrape tweets: {response.StatusCode}");
+      }
+
+    var content = await reponse.Content.ReadAsStringAsync();
+    var tweets = JsonSerializer.Deserialize<List<Tweet>>(content);
+
+    return tweets;
+  }
+}
+
+public class Tweet {
+  public string Id { get; set; }
+  public string Text { get; set; }
+  public DateTime CreateAt { get; set: }
+  public User User { get; set; }
+}
+
+public class User { 
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string ScreenName { get; set; }
+  }
+}
+
+var scraper = new TwitterScraper();
+//If you want to scrape a single key word
+var tweets = await scraper.GetTweetsAsync("KEYWORD HERE")
+
+//Using TPL to scrape multiple tweets simultaneously if you want more than one 
+var tweets = await Task.WhenAll(
+  Task.Run(() => scraper.GetTweetsAsync("Keyword Here")),
+  Task.Run(() => scraper.GetTweetsAsync("Keyword Here")),
+  Task.Run(() => scraper.GetTweetsAsync("Keyword Here")),
+  Task.Run(() => scraper.GetTweetsAsync("Keyword Here"));
+
+
+
+
+
+
+  
