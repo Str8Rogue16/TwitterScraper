@@ -2,18 +2,19 @@
 # working to perfect this code set for Python development and working on a shell at this moment in time. 
 
 
-# importing libraries as 
+# importing libraries 
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
+import datetime
 
 # Connect to the database
 conn = sqlite3.connect('image_database.db')
 c = conn.cursor()
 
-# Create a table to store image URLs
+# Create a table to store image URLs, screenname, date and time posted
 c.execute('''CREATE TABLE IF NOT EXISTS images
-             (url text)''')
+             (url text, screenname text, date text, time text)''')
 
 # Make a request to the website
 url = 'https://www.example.com'
@@ -28,7 +29,11 @@ images = soup.find_all('img')
 # Loop through each image and store its URL in the database
 for image in images:
     url = image['src']
-    c.execute("INSERT INTO images VALUES (?)", (url,))
+    screenname = image['alt']
+    date = datetime.date.today().strftime("%Y-%m-%d")
+    time = datetime.datetime.now().strftime("%H:%M:%S")
+    c.execute("INSERT INTO images VALUES (?, ?, ?, ?)", (url, screenname, date, time))
+
 
 # Commit changes and close the connection
 conn.commit()
